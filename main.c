@@ -55,12 +55,12 @@ void add(struct List *list, const int value) {
 }
 
 void rem(struct List **list, const int value_to_remove) {
+    // we need to track it so the caller knows which element is first
     struct List *first = *list;
-    // we need in case first element (which caller holds is destroyed), or there are no more elements (the list is destroyed)
-    struct List *it = *list;
+    // next element to check for removal
     struct List *next;
 
-    for (; it != NULL; it = next) {
+    for (struct List *it = *list; it != NULL; it = next) {
         next = it->next;
         if (it->value != value_to_remove) continue;
 
@@ -80,16 +80,14 @@ void rem(struct List **list, const int value_to_remove) {
             }
         } else {
             // we don't have an element to the left
-            // we can surmise this is the first element and caller will crash if they don't have the correct element
             if (has_next) {
                 it->next->prev = nullptr;
-                first = it->next;
+                first = it->next; // track the first element for caller
             } else {
-                first = nullptr;
+                first = nullptr; // no elements left
             }
         }
 
-        // free the memory taken by current element
         free(it);
     }
 
